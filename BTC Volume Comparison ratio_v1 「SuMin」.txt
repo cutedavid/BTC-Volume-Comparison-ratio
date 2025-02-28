@@ -1,0 +1,41 @@
+// @version=5
+// @author=Sumin
+indicator("BTC Volume Comparison ratio_v1 「sumin」", shorttitle="VR_v1 「sumin」", overlay=false)
+
+// 获取不同交易所的成交量
+volume_binance = request.security("BINANCE:BTCUSDT", timeframe.period, volume)
+volume_coinbase = request.security("COINBASE:BTCUSD", timeframe.period, volume)
+volume_okx = request.security("OKX:BTCUSDT", timeframe.period, volume)
+volume_bitfinex = request.security("Bitfinex:BTCUSD", timeframe.period, volume)
+volume_bybit = request.security("BYBIT:BTCUSDT", timeframe.period, volume)
+
+// 确保Binance成交量不为零
+safe_division(value, divisor) =>
+    divisor != 0 ? value / divisor : na
+
+// 计算各交易所成交量与Binance成交量的比值
+ratio_coinbase = safe_division(volume_coinbase, volume_binance)
+ratio_okx = safe_division(volume_okx, volume_binance)
+ratio_bfx = safe_division(volume_bitfinex, volume_binance)
+ratio_bybit = safe_division(volume_bybit, volume_binance)
+
+
+// 创建表格
+var table legend = table.new(position.top_right, 5, 1, bgcolor=color.new(color.white, 80))
+
+// 更新表格内容
+if barstate.islast
+    table.cell(legend, 0, 0, "量差比：", text_color=color.white, text_size=size.normal)
+    table.cell(legend, 1, 0, "CB/BN: " + str.tostring(ratio_coinbase, "#.##"), text_color=color.blue, text_size=size.normal)
+    table.cell(legend, 2, 0, "OKX/BN: " + str.tostring(ratio_okx, "#.##"), text_color=color.white, text_size=size.normal)
+    table.cell(legend, 3, 0, "BFX/BN: " + str.tostring(ratio_bfx, "#.##"), text_color=color.green, text_size=size.normal)
+    table.cell(legend, 4, 0, "Bybit/BN: " + str.tostring(ratio_bybit, "#.##"), text_color=color.orange, text_size=size.normal)
+
+
+// 绘制
+plot(ratio_coinbase, color=color.blue, title="CoinBase/Binance", linewidth=2)
+plot(ratio_okx, color=color.white, title="OKX/Binance", linewidth=2)
+plot(ratio_bfx, color=color.green, title="Bitfinex/Binance", linewidth=2)
+plot(ratio_bybit, color=color.orange, title="Bybit/Binance", linewidth=2)
+hline(1, 'base line', color.new(color.white, 50), hline.style_dashed)
+hline(0, 'zero line', color.new(color.white, 50), hline.style_dashed)
