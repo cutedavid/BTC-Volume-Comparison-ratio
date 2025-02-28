@@ -4,7 +4,7 @@
 ## 简介
 这是一个用于比较不同加密货币交易所BTC交易量的TradingView指标。该指标通过计算各大交易所与Binance的成交量比值，帮助交易者了解不同交易所之间的交易活跃度差异。
 
-基于白酒哥（@Felix_Hsu）的推文：https://x.com/Felix_Hsu/status/1894970269535813959
+基于 @Felix_Hsu 的推文：https://x.com/Felix_Hsu/status/1894970269535813959
 
 ## 功能特点
 - 支持5个主要加密货币交易所的数据比较：
