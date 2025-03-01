@@ -1,0 +1,53 @@
+//@version=6
+// @author=Sumin
+
+indicator('Volume Comparison Ratio_v2 「SuMin」', shorttitle = 'VR_v2 「SM」', overlay = false)
+
+// 添加货币选择
+coin_input = input.string('BTC', '选择加密货币', options=['BTC', 'ETH', 'SOL'] )
+
+// 构建不同交易所的交易对名称
+pair_name_usdt = coin_input + 'USDT'  // Binance, OKX, Bybit 使用
+pair_name_usd = coin_input + 'USD'    // Coinbase, Bitfinex 使用
+
+// 添加文字大小选项
+text_size_input = input.string('Normal', '文字大小', options=['Tiny', 'Normal'])
+table_text_size = text_size_input == 'Tiny' ? size.tiny : size.normal
+
+// 获取不同交易所的成交量，并添加错误处理
+volume_binance = request.security('BINANCE:' + pair_name_usdt, timeframe.period, volume, ignore_invalid_symbol=true)
+volume_coinbase = request.security('COINBASE:' + pair_name_usd, timeframe.period, volume, ignore_invalid_symbol=true)
+volume_okx = request.security('OKX:' + pair_name_usdt, timeframe.period, volume, ignore_invalid_symbol=true)
+volume_bitfinex = request.security('BITFINEX:' + pair_name_usd, timeframe.period, volume, ignore_invalid_symbol=true)
+volume_bybit = request.security('BYBIT:' + pair_name_usdt, timeframe.period, volume, ignore_invalid_symbol=true)
+
+// 确保Binance成交量不为零
+safe_division(value, divisor) =>
+    divisor != 0 ? value / divisor : na
+
+// 计算各交易所成交量与Binance成交量的比值
+ratio_coinbase = safe_division(volume_coinbase, volume_binance)
+ratio_okx = safe_division(volume_okx, volume_binance)
+ratio_bfx = safe_division(volume_bitfinex, volume_binance)
+ratio_bybit = safe_division(volume_bybit, volume_binance)
+
+// 创建表格
+var table legend = table.new(position.top_right, 5, 1, bgcolor = color.new(color.white, 80))
+
+// 更新表格内容
+if barstate.islast
+    table.cell(legend, 0, 0, '量差比：', text_color = color.white, text_size = table_text_size)
+    table.cell(legend, 1, 0, not na(ratio_coinbase) ? ('CB/BN: ' + str.tostring(ratio_coinbase, '#.##')) : 'CB/BN: N/A', text_color = color.blue, text_size = table_text_size)
+    table.cell(legend, 2, 0, not na(ratio_okx) ? ('OKX/BN: ' + str.tostring(ratio_okx, '#.##')) : 'OKX/BN: N/A', text_color = color.white, text_size = table_text_size)
+    table.cell(legend, 3, 0, not na(ratio_bfx) ? ('BFX/BN: ' + str.tostring(ratio_bfx, '#.##')) : 'BFX/BN: N/A', text_color = color.green, text_size = table_text_size)
+    table.cell(legend, 4, 0, not na(ratio_bybit) ? ('Bybit/BN: ' + str.tostring(ratio_bybit, '#.##')) : 'Bybit/BN: N/A', text_color = color.orange, text_size = table_text_size)
+
+// 绘制
+plot(not na(ratio_coinbase) ? ratio_coinbase : na, color = color.blue, title = 'CoinBase/Binance', linewidth = 2)
+plot(not na(ratio_okx) ? ratio_okx : na, color = color.white, title = 'OKX/Binance', linewidth = 2)
+plot(not na(ratio_bfx) ? ratio_bfx : na, color = color.green, title = 'Bitfinex/Binance', linewidth = 2)
+plot(not na(ratio_bybit) ? ratio_bybit : na, color = color.orange, title = 'Bybit/Binance', linewidth = 2)
+
+
+hline(1, 'base line', color.new(color.white, 50), hline.style_dashed)
+hline(0, 'zero line', color.new(color.white, 50), hline.style_dashed)
