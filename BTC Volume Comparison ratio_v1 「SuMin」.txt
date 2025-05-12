@@ -1,6 +1,6 @@
 // @version=5
 // @author=Sumin
-indicator("BTC Volume Comparison ratio_v1 「sumin」", shorttitle="VR_v1 「sumin」", overlay=false)
+indicator("BTC Volume Comparison Ratio V1 ", shorttitle="VR_V1 ", overlay=false)
 
 // 获取不同交易所的成交量
 volume_binance = request.security("BINANCE:BTCUSDT", timeframe.period, volume)
