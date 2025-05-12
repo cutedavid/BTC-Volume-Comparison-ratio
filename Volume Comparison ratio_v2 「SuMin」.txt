@@ -1,7 +1,7 @@
 //@version=6
 // @author=Sumin
 
-indicator('Volume Comparison Ratio_v2 「SuMin」', shorttitle = 'VR_v2 「SM」', overlay = false)
+indicator('Volume Comparison Ratio V2', shorttitle = 'VR V2', overlay = false)
 
 // 添加货币选择
 coin_input = input.string('BTC', '选择加密货币', options=['BTC', 'ETH', 'SOL'] )
